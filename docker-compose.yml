@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    command: uvicorn src.api:app --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+
+  notebook:
+    build:
+      context: .
+      dockerfile: docker/notebook.Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - "8888:8888"
+    environment:
+      - PYTHONPATH=/app
+
