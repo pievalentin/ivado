@@ -274,7 +274,8 @@ def parse_museum_table(wikitext: str) -> Tuple[List[MuseumRecord], List[Mapping[
 
 def parse_city_population_csv(path: Path = CITY_CSV_PATH) -> Iterable[Mapping[str, object]]:
     if not path.exists():
-        raise FileNotFoundError(f"City population CSV missing at {path}")
+        raise FileNotFoundError(f"City population CSV missing at {path}. Please run `just download` to fetch it.")
+    # End of Selection
     latest: dict[tuple[str, str], dict[str, object]] = {}
     with path.open("r", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
