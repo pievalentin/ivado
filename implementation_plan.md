@@ -6,78 +6,6 @@ This document outlines the architectural decisions, design rationale, and trade-
 
 ## Project Architecture
 
-### System Overview
-
-```mermaid
-graph TB
-    subgraph "Data Sources"
-        WP[Wikipedia API<br/>Museum Data]
-        UNSD[UN Statistics<br/>City Population CSV]
-    end
-    
-    subgraph "ETL Pipeline"
-        ETL[ETL Process<br/>src/etl.py]
-        WP --> ETL
-        UNSD --> ETL
-    end
-    
-    subgraph "Data Storage"
-        DB[(SQLite Database<br/>museums.sqlite)]
-        ETL --> DB
-    end
-    
-    subgraph "Machine Learning"
-        FEAT[Feature Engineering<br/>build_features_frame]
-        TRAIN[Model Training<br/>Linear Regression]
-        MODEL[Model Artifact<br/>JSON File]
-        
-        DB --> FEAT
-        FEAT --> TRAIN
-        TRAIN --> MODEL
-    end
-    
-    subgraph "API Layer"
-        API[FastAPI Service<br/>src/api.py]
-        MODEL --> API
-    end
-    
-    subgraph "Client Interface"
-        CLI[Command Line<br/>src/cli.py]
-        WEB[Web Interface<br/>Swagger/OpenAPI]
-        NOTEBOOK[Jupyter Notebook<br/>Data Exploration]
-        
-        CLI --> ETL
-        CLI --> TRAIN
-        WEB --> API
-        NOTEBOOK --> DB
-        NOTEBOOK --> MODEL
-    end
-    
-    subgraph "Deployment"
-        DOCKER[Docker Containers]
-        API --> DOCKER
-        NOTEBOOK --> DOCKER
-    end
-    
-    subgraph "External Access"
-        USER[End Users]
-        DEV[Data Scientists]
-        
-        USER --> WEB
-        DEV --> NOTEBOOK
-    end
-
-    classDef dataSource fill:#e1f5fe
-    classDef processing fill:#f3e5f5
-    classDef storage fill:#e8f5e8
-    classDef interface fill:#fff3e0
-    
-    class WP,UNSD dataSource
-    class ETL,FEAT,TRAIN processing
-    class DB,MODEL storage
-    class CLI,WEB,NOTEBOOK,API interface
-```
-
 ### 1. Data Acquisition Strategy
 
 #### Wikipedia API Integration
@@ -113,6 +41,23 @@ graph TB
   - **Cons**: Limited concurrent write performance; not suitable for high-traffic production scenarios; no network access (requires file system access)
 
 #### Schema Design
+
+```mermaid
+erDiagram
+    museums {
+        integer id PK
+        text name "NOT NULL"
+        text location
+        text country
+        real visitors_millions
+        integer year
+        text coordinates
+        text type
+        integer city_population
+        text city_matched
+    }
+```
+
 ```sql
 -- Museums table with comprehensive metadata
 CREATE TABLE museums (
