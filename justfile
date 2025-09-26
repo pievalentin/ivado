@@ -16,6 +16,14 @@ etl:
 train:
 	uv run python -m src.cli train
 
+# Run all unit tests.
+test:
+	uv run python -m pytest tests/ -v
+
+# Run tests with coverage report.
+test-coverage:
+	uv run python -m pytest tests/ --cov=src --cov-report=term-missing
+
 # Run the FastAPI server locally.
 serve host="0.0.0.0" port="8000":
 	uv run uvicorn src.api:app --host {{host}} --port {{port}}
